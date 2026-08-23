@@ -30,8 +30,9 @@ jobs:
           WEBGOAT_USERNAME: ${{ secrets.WEBGOAT_USERNAME }}
           WEBGOAT_PASSWORD: ${{ secrets.WEBGOAT_PASSWORD }}
         # In the workflow, temporarily add a debug step (remove after checking):
-        echo "username length: ${#WEBGOAT_USERNAME}, password length: ${#WEBGOAT_PASSWORD}"
+        
         run: |
+          echo "username length: ${#WEBGOAT_USERNAME}, password length: ${#WEBGOAT_PASSWORD}"
           docker run --network=host \
             -v /runner-work/WebGoat/WebGoat:/zap/wrk/:rw \
             -e WEBGOAT_USERNAME \
