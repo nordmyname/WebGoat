@@ -1,4 +1,7 @@
 env:
+  vars:
+    webgoatUsername: "${WEBGOAT_USERNAME}"
+    webgoatPassword: "${WEBGOAT_PASSWORD}"
   contexts:
     - name: "webgoat-authenticated"
       urls:
@@ -21,8 +24,8 @@ env:
       users:
         - name: "lab-user"
           credentials:
-            username: "${WEBGOAT_USERNAME}"
-            password: "${WEBGOAT_PASSWORD}"
+            username: "${webgoatUsername}"
+            password: "${webgoatPassword}"
 
 jobs:
   - type: "spider"
