@@ -14,11 +14,8 @@ env:
           loginRequestUrl: "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/login"
           loginRequestBody: "username={%username%}&password={%password%}"
         verification:
-          method: "poll"
-          pollFrequency: 60
-          pollUnits: "requests"
-          pollUrl: "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/"
-          pollAdditionalHeaders: []
+          method: "response"
+          loggedOutRegex: "\\Q<title>Login Page</title>\\E"
       sessionManagement:
         method: "cookie"
       users:
