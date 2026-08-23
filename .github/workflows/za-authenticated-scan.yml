@@ -22,6 +22,9 @@ jobs:
       - name: Pull ZAP image
         run: docker pull ghcr.io/zaproxy/zaproxy:stable
 
+      - name: Make checkout dir writable for the ZAP container's non-root user
+        run: chmod -R a+w /runner-work/WebGoat/WebGoat
+
       - name: Run authenticated full scan
         env:
           WEBGOAT_USERNAME: ${{ secrets.WEBGOAT_USERNAME }}
