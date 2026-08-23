@@ -1,0 +1,19 @@
+env:
+  contexts:
+    - name: "webgoat-noauth-debug"
+      urls:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/"
+      includePaths:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/.*"
+
+jobs:
+  - type: "spider"
+    parameters:
+      context: "webgoat-noauth-debug"
+      maxDuration: 2
+
+  - type: "report"
+    parameters:
+      template: "traditional-json"
+      reportDir: "/zap/wrk/"
+      reportFile: "webgoat-debug-report.json"
