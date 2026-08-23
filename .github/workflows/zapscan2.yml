@@ -1,4 +1,4 @@
-name: "ZAP Authenticated Full Scan -2- WebGoat"
+name: "ZAP Authenticated Full Scan - 2 - WebGoat"
 
 on:
   workflow_dispatch:
