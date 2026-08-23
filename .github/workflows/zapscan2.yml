@@ -1,0 +1,49 @@
+name: "ZAP Authenticated Full Scan -2- WebGoat"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 20 * * 6'   # weekly, off-peak from the baseline scan's own schedule
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  zap_fullscan_webgoat:
+    runs-on: [self-hosted, appsec-lab]
+    name: Authenticated active scan - WebGoat
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+
+      - name: Pull ZAP image
+        run: docker pull ghcr.io/zaproxy/zaproxy:stable
+
+      - name: Make checkout dir writable for the ZAP container's non-root user
+        run: chmod -R a+w /runner-work/WebGoat/WebGoat
+
+      - name: Run authenticated full scan
+        env:
+          WEBGOAT_USERNAME: ${{ secrets.WEBGOAT_USERNAME }}
+          WEBGOAT_PASSWORD: ${{ secrets.WEBGOAT_PASSWORD }}
+        # In the workflow, temporarily add a debug step (remove after checking):
+        echo "username length: ${#WEBGOAT_USERNAME}, password length: ${#WEBGOAT_PASSWORD}"
+        run: |
+          docker run --network=host \
+            -v /runner-work/WebGoat/WebGoat:/zap/wrk/:rw \
+            -e WEBGOAT_USERNAME \
+            -e WEBGOAT_PASSWORD \
+            -t ghcr.io/zaproxy/zaproxy:stable \
+            zap.sh -cmd -autorun /zap/wrk/.zap/webgoat-fullscan-plan.yaml
+
+      - name: Upload scan reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-webgoat-fullscan-report
+          path: |
+            webgoat-fullscan-report.json
+            webgoat-fullscan-report.html
