@@ -1,0 +1,61 @@
+env:
+  vars:
+    webgoatUsername: "${WEBGOAT_USERNAME}"
+    webgoatPassword: "${WEBGOAT_PASSWORD}"
+  contexts:
+    - name: "webgoat-authenticated"
+      urls:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/"
+      includePaths:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/.*"
+      excludePaths:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/logout.*"
+      authentication:
+        method: "form"
+        parameters:
+          loginPageUrl: "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/login"
+          loginRequestUrl: "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/login"
+          loginRequestBody: "username={%username%}&password={%password%}"
+        verification:
+          method: "poll"
+          pollUrl: "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/welcome.mvc"
+          pollFrequency: 10
+          pollUnits: "requests"
+      sessionManagement:
+        method: "cookie"
+      users:
+        - name: "lab-user"
+          credentials:
+            username: "${webgoatUsername}"
+            password: "${webgoatPassword}"
+
+jobs:
+  - type: "spider"
+    parameters:
+      context: "webgoat-authenticated"
+      user: "lab-user"
+      maxDuration: 5
+
+  - type: "passiveScan-wait"
+    parameters:
+      maxDuration: 5
+
+  - type: "activeScan"
+    parameters:
+      context: "webgoat-authenticated"
+      user: "lab-user"
+      policy: "Default Policy"
+      maxRuleDurationInMins: 5
+      maxScanDurationInMins: 30
+
+  - type: "report"
+    parameters:
+      template: "traditional-json"
+      reportDir: "/zap/wrk/"
+      reportFile: "webgoat-fullscan-report.json"
+
+  - type: "report"
+    parameters:
+      template: "traditional-html"
+      reportDir: "/zap/wrk/"
+      reportFile: "webgoat-fullscan-report.html"
