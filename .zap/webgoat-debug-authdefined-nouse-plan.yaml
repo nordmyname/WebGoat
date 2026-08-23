@@ -1,0 +1,41 @@
+env:
+  vars:
+    webgoatUsername: "${WEBGOAT_USERNAME}"
+    webgoatPassword: "${WEBGOAT_PASSWORD}"
+  contexts:
+    - name: "webgoat-authdefined-debug"
+      urls:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/"
+      includePaths:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/.*"
+      authentication:
+        method: "form"
+        parameters:
+          loginPageUrl: "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/login"
+          loginRequestUrl: "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/login"
+          loginRequestBody: "username={%username%}&password={%password%}"
+        verification:
+          method: "response"
+          loggedOutRegex: "\\Q<title>Login Page</title>\\E"
+      sessionManagement:
+        method: "cookie"
+      users:
+        - name: "lab-user"
+          credentials:
+            username: "${webgoatUsername}"
+            password: "${webgoatPassword}"
+
+jobs:
+  - type: "spider"
+    parameters:
+      context: "webgoat-authdefined-debug"
+      # NOTE: deliberately no "user:" param here — spider runs unauthenticated
+      # even though the context has auth fully defined, to isolate whether
+      # just DEFINING authentication breaks things, or only USING it does.
+      maxDuration: 2
+
+  - type: "report"
+    parameters:
+      template: "traditional-json"
+      reportDir: "/zap/wrk/"
+      reportFile: "webgoat-debug3-report.json"
