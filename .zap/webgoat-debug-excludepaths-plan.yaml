@@ -1,0 +1,21 @@
+env:
+  contexts:
+    - name: "webgoat-excludepaths-debug"
+      urls:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/"
+      includePaths:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/.*"
+      excludePaths:
+        - "http://webgoat.appsec-lab-target.svc.cluster.local:8080/WebGoat/logout.*"
+
+jobs:
+  - type: "spider"
+    parameters:
+      context: "webgoat-excludepaths-debug"
+      maxDuration: 2
+
+  - type: "report"
+    parameters:
+      template: "traditional-json"
+      reportDir: "/zap/wrk/"
+      reportFile: "webgoat-debug2-report.json"
