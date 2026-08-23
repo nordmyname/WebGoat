@@ -36,7 +36,7 @@ jobs:
             -e WEBGOAT_USERNAME \
             -e WEBGOAT_PASSWORD \
             -t ghcr.io/zaproxy/zaproxy:stable \
-            zap.sh -cmd -autorun /zap/wrk/.zap/webgoat-fullscan-plan.yaml
+            zap.sh -cmd -autorun 
 
       - name: Upload scan reports
         uses: actions/upload-artifact@v4
